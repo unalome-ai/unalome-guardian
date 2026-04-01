@@ -35,6 +35,14 @@
     "category": "DeveloperTool",
     "shortDescription": "Privacy Data Minimizer",
     "longDescription": "Unalome Guardian wraps Microsoft Presidio to auto-redact sensitive data before sending to AI APIs.",
-    "macOS": { "minimumSystemVersion": "10.15" }
+    "macOS": {
+      "minimumSystemVersion": "10.15",
+      "dmg": {
+        "background": "../dmg-background.png",
+        "windowSize": { "width": 660, "height": 400 },
+        "appPosition": { "x": 130, "y": 170 },
+        "applicationFolderPosition": { "x": 530, "y": 170 }
+      }
+    }
   }
 }
