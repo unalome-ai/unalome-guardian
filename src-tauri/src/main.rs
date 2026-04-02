@@ -48,23 +48,30 @@ impl PresidioProcess {
 }
 
 fn resolve_python_script() -> Option<String> {
-    let candidates = [
-        "../guardian_backend/presidio_cli.py".to_string(),
-        "guardian_backend/presidio_cli.py".to_string(),
-    ];
-
+    // 1. Check bundled resources (inside .app/Contents/Resources/)
     if let Ok(exe) = std::env::current_exe() {
         if let Some(exe_dir) = exe.parent() {
-            let from_exe = exe_dir.join("../guardian_backend/presidio_cli.py");
-            if from_exe.exists() {
-                return from_exe.to_str().map(|s| s.to_string());
+            // Tauri bundles resources next to the binary on Linux/Windows
+            let beside_exe = exe_dir.join("presidio_cli.py");
+            if beside_exe.exists() {
+                return beside_exe.to_str().map(|s| s.to_string());
+            }
+            // macOS: .app/Contents/MacOS/../Resources/
+            let macos_resource = exe_dir.join("../Resources/presidio_cli.py");
+            if macos_resource.exists() {
+                return macos_resource.canonicalize().ok()?.to_str().map(|s| s.to_string());
             }
         }
     }
 
-    for path in &candidates {
+    // 2. Development paths (running from source)
+    let dev_candidates = [
+        "../guardian_backend/presidio_cli.py",
+        "guardian_backend/presidio_cli.py",
+    ];
+    for path in &dev_candidates {
         if std::path::Path::new(path).exists() {
-            return Some(path.clone());
+            return Some(path.to_string());
         }
     }
 
